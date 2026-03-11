@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layo Edits - Professional Podcast Editing</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="shortcut icon" href="logo.png">
+
+    <!-- Google Fonts: Space Grotesk for that slim, tech feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'base-cream': '#FFFDF5',
+                        'neon-purple': '#a855f7',
+                        'slime-green': '#bef264',
+                        'bubble-pink': '#f472b6',
+                        'electric-blue': '#3b82f6',
+                        'dark-text': '#18181b',
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        heading: ['Space Grotesk', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'hard': '4px 4px 0px 0px rgba(0,0,0,1)',
+                        'hard-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
+                        'hard-hover': '1px 1px 0px 0px rgba(0,0,0,1)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Global box-sizing fix */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Prevent horizontal scrolling on mobile */
+        html {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        body {
+            background-color: #FFFDF5;
+            color: #18181b;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 300;
+            position: relative;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFFDF5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #18181b;
+            border-radius: 0px;
+            border: 1px solid #FFFDF5;
+        }
+
+        .marquee-wrapper {
+            overflow: hidden;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .carousel-track {
+            animation: scroll 30s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-304px * 5)); }
+        }
+
+        /* Mobile carousel animation adjustments */
+        @media (max-width: 768px) {
+            @keyframes scroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-264px * 5)); }
+            }
+        }
+
+        @media (max-width: 375px) {
+            @keyframes scroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-224px * 5)); }
+            }
+        }
+
+        .phone-card {
+            width: 280px;
+            height: 500px;
+            flex-shrink: 0;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            border: 2px solid #000;
+        }
+        .phone-card:hover {
+            transform: scale(1.02) translateY(-10px);
+            z-index: 10;
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        }
+        .tiktok-ui-right {
+            position: absolute;
+            right: 15px;
+            bottom: 80px;
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            z-index: 20;
+            pointer-events: auto;
+        }
+        .tiktok-ui-bottom {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 60px;
+            color: white;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        /* Ensure video container doesn't overflow and hide siblings */
+        .phone-card > div:first-child {
+            z-index: 1;
+        }
+        .phone-card .tiktok-ui-right,
+        .phone-card .tiktok-ui-bottom {
+            z-index: 20;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .cursor-follow {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 15px;
+            height: 15px;
+            border: 1px solid #18181b;
+            border-radius: 50%;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        @media (hover: none) {
+            .cursor-follow { display: none; }
+        }
+
+        /* Mobile overflow prevention */
+        @media (max-width: 768px) {
+            html, body {
+                overflow-x: hidden !important;
+                max-width: 100vw;
+            }
+
+            /* Ensure sections don't overflow */
+            section {
+                overflow-x: hidden;
+                max-width: 100vw;
+            }
+
+            /* Constrain phone cards in carousel on mobile */
+            .phone-card {
+                width: 240px;
+                height: 420px;
+            }
+
+            /* Ensure grid items don't overflow */
+            .grid {
+                max-width: 100%;
+            }
+        }
+
+        /* Extra small mobile devices */
+        @media (max-width: 375px) {
+            .phone-card {
+                width: 200px;
+                height: 360px;
+            }
+        }
+
+        /* Ensure all images and media stay within bounds */
+        img, video, iframe {
+            max-width: 100%;
+        }
+
+        /* Fix for video elements in phone cards - prevent height:auto from breaking absolute positioning */
+        .phone-card video {
+            height: 100% !important;
+            max-width: none;
+        }
+
+        /* Ensure max-w containers don't overflow */
+        .max-w-7xl, .max-w-3xl, .max-w-2xl, .max-w-lg {
+            width: 100%;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Custom Cursor -->
+    <div class="cursor-follow hidden md:block"></div>
+
+    <!-- Voice Clone Modal -->
+    <div id="clone-modal" class="modal">
+        <div class="bg-white border-2 border-black rounded-3xl p-8 max-w-2xl w-full mx-4 shadow-[10px_10px_0px_0px_#000] max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3">
+                    <img src="logo.png" alt="Layo Edits" class="h-10 w-auto">
+                    <h3 class="font-heading font-medium text-3xl">Submit Your Episode</h3>
+                </div>
+                <button onclick="closeCloneModal()" class="text-2xl hover:text-neon-purple transition-colors">&times;</button>
+            </div>
+
+            <div id="clone-step-1" class="clone-step">
+                <p class="font-sans font-light text-gray-600 mb-6">Send us whatever you've got — messy, noisy, full of ums and ahs. We've seen it all and we genuinely love it.</p>
+
+                <!-- Recording Tips Collapsible -->
+                <details class="mb-6 border-2 border-black rounded-xl overflow-hidden">
+                    <summary class="bg-gray-50 px-4 py-3 cursor-pointer font-heading font-medium flex items-center gap-2 hover:bg-gray-100 transition-colors">
+                        <i class="fa-solid fa-lightbulb text-yellow-500"></i>
+                        Tips for Best Edit Results
+                        <i class="fa-solid fa-chevron-down ml-auto text-sm"></i>
+                    </summary>
+                    <div class="p-4 bg-white space-y-2">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-volume-xmark text-gray-400 mt-1"></i>
+                            <p class="text-sm text-gray-600 font-light">Film or record wherever works for you — we'll clean everything up</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-microphone-lines text-gray-400 mt-1"></i>
+                            <p class="text-sm text-gray-600 font-light">Any podcast setup works — solo, co-hosted, remote guest, we edit it all</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-clock text-gray-400 mt-1"></i>
+                            <p class="text-sm text-gray-600 font-light">Files under 2GB are ideal for fast upload and turnaround</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-ban text-gray-400 mt-1"></i>
+                            <p class="text-sm text-gray-600 font-light">Include edit notes in the instructions box after upload</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-layer-group text-gray-400 mt-1"></i>
+                            <p class="text-sm text-gray-600 font-light">MP3, WAV, M4A, MP4, and MOV — we accept every podcast format</p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Tab Buttons -->
+                <div class="flex gap-2 mb-6">
+                    <button id="upload-tab-btn" onclick="switchToUpload()" class="flex-1 py-3 px-4 font-heading font-medium border-2 border-black rounded-xl bg-black text-white transition-all">
+                        <i class="fa-solid fa-upload mr-2"></i> Upload File
+                    </button>
+                    <button id="record-tab-btn" onclick="switchToRecord()" class="flex-1 py-3 px-4 font-heading font-medium border-2 border-black rounded-xl bg-white text-black hover:bg-gray-50 transition-all">
+                        <i class="fa-solid fa-microphone mr-2"></i> Record Episode
+                    </button>
+                </div>
+
+                <!-- Upload Section -->
+                <div id="upload-section">
+                    <div class="border-2 border-dashed border-black rounded-2xl p-8 text-center mb-6 hover:bg-gray-50 transition-colors cursor-pointer" id="upload-zone">
+                        <i class="fa-solid fa-cloud-arrow-up text-5xl text-gray-300 mb-4 pointer-events-none"></i>
+                        <p class="font-heading font-medium mb-2 pointer-events-none">Drop your podcast episode here or click to upload</p>
+                        <p class="text-sm text-gray-500 font-light pointer-events-none">MP3, WAV, M4A, MP4 (max 500MB)</p>
+                        <input type="file" id="voice-file" accept="audio/*" class="hidden">
+                    </div>
+                </div>
+
+                <!-- Record Section -->
+                <div id="record-section" class="hidden">
+                    <div class="border-2 border-black rounded-2xl p-8 text-center mb-6 bg-gray-50">
+                        <div id="record-idle" class="record-state">
+                            <i class="fa-solid fa-microphone text-5xl text-gray-300 mb-4"></i>
+                            <p class="font-heading font-medium mb-2">Record a quick episode preview</p>
+                            <p class="text-sm text-gray-500 font-light mb-4">Hit the button and talk for 30 seconds — just like you do on your podcast</p>
+                        </div>
+
+                        <div id="record-active" class="record-state hidden">
+                            <div class="flex justify-center items-center gap-2 mb-4">
+                                <div class="w-2 h-8 bg-red-500 rounded-full animate-pulse"></div>
+                                <div class="w-2 h-12 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
+                                <div class="w-2 h-16 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                                <div class="w-2 h-12 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.3s"></div>
+                                <div class="w-2 h-8 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                            </div>
+                            <p class="font-heading font-medium text-2xl mb-2">Recording...</p>
+                            <p class="text-3xl font-mono font-bold text-red-500" id="record-timer">00:30</p>
+                            <p class="text-sm text-gray-500 font-light mt-2">Talk naturally — just like you do on your podcast</p>
+                        </div>
+
+                        <div id="record-complete" class="record-state hidden">
+                            <i class="fa-solid fa-check-circle text-5xl text-slime-green mb-4"></i>
+                            <p class="font-heading font-medium mb-2">Recording complete!</p>
+                            <p class="text-sm text-gray-500 font-light mb-4" id="record-duration">30-second episode preview captured</p>
+
+                            <!-- Audio Playback -->
+                            <div class="bg-white border-2 border-black rounded-xl p-4 mb-4">
+                                <audio id="recorded-audio-playback" controls class="w-full">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
+
+                            <p class="text-xs text-gray-500 font-light">
+                                <i class="fa-solid fa-play-circle mr-1"></i> Play it back before continuing
+                            </p>
+                        </div>
+
+                        <button onclick="toggleRecording()" id="record-btn" class="mt-4 bg-red-500 text-white font-heading font-medium text-lg py-3 px-8 rounded-full shadow-hard hover:bg-red-600 transition-all">
+                            <i class="fa-solid fa-circle mr-2"></i> Start Recording
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Transcription Text Field -->
+                <div class="mb-6" id="transcription-container">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-heading font-medium text-sm block">
+                            Quick Notes
+                            <span class="text-gray-400 font-light" id="transcription-label-hint">(Optional — add context about your episode)</span>
+                        </label>
+                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium" id="transcription-badge">
+                            <i class="fa-solid fa-magic-wand-sparkles mr-1"></i>Optional
+                        </span>
+                    </div>
+                    <textarea
+                        id="transcription-text"
+                        rows="3"
+                        maxlength="500"
+                        placeholder="e.g. guest name, episode topic, anything we should know before editing..."
+                        class="w-full border-2 border-black rounded-xl px-4 py-3 font-sans font-light focus:outline-none focus:ring-2 focus:ring-slime-green resize-none transition-all"
+                    ></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <p class="text-xs text-gray-500 font-light">
+                            <i class="fa-solid fa-lightbulb text-yellow-500 mr-1"></i>
+                            Context helps us deliver a better edit faster
+                        </p>
+                        <span class="text-xs text-gray-400 font-mono" id="transcription-char-count">0/500</span>
+                    </div>
+                </div>
+
+                <div id="upload-progress" class="hidden mb-6">
+                    <div class="bg-gray-200 rounded-full h-4 border-2 border-black overflow-hidden">
+                        <div id="progress-bar" class="bg-neon-purple h-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p id="progress-text" class="text-sm text-gray-600 mt-2 text-center font-light">Uploading...</p>
+                </div>
+
+                <button onclick="uploadVoice()" id="upload-btn" class="w-full bg-black text-white font-heading font-medium text-lg py-4 rounded-xl shadow-hard hover:bg-neon-purple transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Continue to Step 2
+                </button>
+            </div>
+
+            <div id="clone-step-2" class="clone-step hidden">
+                <p class="font-sans font-light text-gray-600 mb-6">We've got it! Tell us what you're going for — we want to make this exactly right for you.</p>
+
+                <div class="mb-6">
+                    <label class="font-medium font-heading text-sm uppercase mb-2 block">Episode Reference ID</label>
+                    <input type="text" id="model-id" readonly class="w-full border-2 border-black rounded-xl px-4 py-3 font-mono text-sm bg-gray-50">
+                </div>
+
+                <div class="mb-6">
+                    <label class="font-medium font-heading text-sm uppercase mb-2 block">Edit Instructions</label>
+                    <textarea id="script-text" rows="6" placeholder="Tell us what you need — noise removal, cuts, music, show notes, transcription, etc." class="w-full border-2 border-black rounded-xl px-4 py-3 font-sans font-light focus:outline-none focus:ring-2 focus:ring-slime-green resize-none"></textarea>
+                    <p class="text-sm text-gray-500 mt-2 font-light">Character count: <span id="char-count">0</span></p>
+                </div>
+
+                <button onclick="generateSpeech()" id="generate-btn" class="w-full bg-black text-white font-heading font-medium text-lg py-4 rounded-xl shadow-hard hover:bg-slime-green hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Submit for Editing
+                </button>
+            </div>
+
+            <div id="clone-step-3" class="clone-step hidden">
+                <div class="text-center mb-6">
+                    <div class="inline-block bg-slime-green border-2 border-black rounded-full p-6 mb-4">
+                        <i class="fa-solid fa-check text-4xl"></i>
+                    </div>
+                    <h4 class="font-heading font-medium text-2xl mb-2">Episode Submitted!</h4>
+                    <p class="font-sans font-light text-gray-600">We've got your episode and will start editing within 24 hours.</p>
+                </div>
+
+                <div class="bg-gray-50 border-2 border-black rounded-2xl p-6 mb-6">
+                    <audio id="generated-audio" controls class="w-full mb-4"></audio>
+                    <button onclick="downloadAudio()" class="w-full bg-electric-blue text-white font-heading font-medium py-3 rounded-xl shadow-hard hover:shadow-hard-hover transition-all">
+                        <i class="fa-solid fa-download mr-2"></i> Download Edited Episode
+                    </button>
+                </div>
+
+                <button onclick="resetCloneModal()" class="w-full bg-white border-2 border-black text-black font-heading font-medium py-3 rounded-xl shadow-hard hover:bg-gray-50 transition-all">
+                    Submit Another Episode
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Sign Up Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="bg-white border-2 border-black rounded-3xl p-8 max-w-lg w-full mx-4 shadow-[10px_10px_0px_0px_#000] max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3">
+                    <img src="logo.png" alt="Layo Edits" class="h-10 w-auto">
+                    <h3 class="font-heading font-medium text-3xl">Get Started</h3>
+                </div>
+                <button onclick="closeSignupModal()" class="text-2xl hover:text-neon-purple transition-colors">&times;</button>
+            </div>
+
+            <div id="signup-step-1" class="signup-step">
+                <p class="font-sans font-light text-gray-600 mb-6">Hundreds of podcasters have handed us their raw recordings and never looked back. You're in great company.</p>
+
+                <form onsubmit="handleSignup(event)" class="space-y-4">
+                    <!-- Full Name -->
+                    <div>
+                        <label class="font-heading font-medium text-sm mb-2 block">Full Name</label>
+                        <input type="text" id="signup-name" placeholder="Alex Johnson" class="w-full border-2 border-black rounded-xl px-4 py-3 font-sans font-light focus:outline-none focus:ring-2 focus:ring-slime-green transition-all" required>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label class="font-heading font-medium text-sm mb-2 block">Email Address</label>
+                        <input type="email" id="signup-email" placeholder="alex@example.com" class="w-full border-2 border-black rounded-xl px-4 py-3 font-sans font-light focus:outline-none focus:ring-2 focus:ring-slime-green transition-all" required>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label class="font-heading font-medium text-sm mb-2 block">Password</label>
+                        <input type="password" id="signup-password" placeholder="••••••••" class="w-full border-2 border-black rounded-xl px-4 py-3 font-sans font-light focus:outline-none focus:ring-2 focus:ring-slime-green transition-all" required minlength="8">
+                        <p class="text-xs text-gray-500 mt-1 font-light">Minimum 8 characters</p>
+                    </div>
+
+                    <!-- Creator Type -->
+                    <div>
+                        <label class="font-heading font-medium text-sm mb-2 block">My show is...</label>
+                        <select id="signup-type" class="w-full border-2 border-black rounded-xl px-4 py-3 font-sans font-light focus:outline-none focus:ring-2 focus:ring-slime-green transition-all bg-white appearance-none cursor-pointer" required>
+                            <option value="">Select your show type</option>
+                            <option value="solo">Solo Podcaster</option>
+                            <option value="interview">Interview Show</option>
+                            <option value="truecrime">True Crime</option>
+                            <option value="business">Business / Education</option>
+                            <option value="comedy">Comedy</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox" id="signup-terms" class="mt-1 w-5 h-5 border-2 border-black rounded focus:ring-2 focus:ring-slime-green" required>
+                        <label for="signup-terms" class="text-sm font-light text-gray-600">
+                            I agree to the <a href="terms.html" target="_blank" class="text-black font-medium underline hover:text-neon-purple">Terms of Service</a> and <a href="privacy.html" target="_blank" class="text-black font-medium underline hover:text-neon-purple">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full bg-black text-white font-heading font-medium text-lg py-4 rounded-xl shadow-hard hover:bg-slime-green hover:text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard-hover transition-all mt-6">
+                        Create Account
+                    </button>
+                </form>
+
+                <!-- Already have account -->
+                <p class="text-center text-sm text-gray-600 mt-6 font-light">
+                    Already have an account? <a href="#" onclick="openLoginModal(event)" class="text-black font-medium underline hover:text-neon-purple">Sign In</a>
+                </p>
+            </div>
+
+            <!-- Welcome Step (after signup) -->
+            <div id="signup-step-2" class="signup-step hidden">
+                <div class="text-center mb-6">
+                    <div class="inline-block bg-slime-green border-2 border-black rounded-full p-6 mb-4">
+                        <i class="fa-solid fa-party-horn text-4xl"></i>
+                    </div>
+                    <h4 class="font-heading font-medium text-3xl mb-2">Welcome to Layo Edits!</h4>
+                    <p class="font-sans font-light text-gray-600 mb-6">Your first edit is on us — and we're genuinely excited to hear what you're making.</p>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-start gap-4 p-4 border-2 border-black rounded-xl">
+                        <div class="w-10 h-10 rounded-full bg-slime-green border-2 border-black flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-microphone text-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-heading font-medium mb-1">Submit Your Episode</h5>
+                            <p class="text-sm font-light text-gray-600">Upload your raw audio or video file</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 border-2 border-black rounded-xl">
+                        <div class="w-10 h-10 rounded-full bg-electric-blue border-2 border-black flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-heading font-medium mb-1">We Handle Everything</h5>
+                            <p class="text-sm font-light text-gray-600">Editing, show notes, transcription, and more</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 border-2 border-black rounded-xl">
+                        <div class="w-10 h-10 rounded-full bg-neon-purple border-2 border-black flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-download text-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-heading font-medium mb-1">Download & Publish</h5>
+                            <p class="text-sm font-light text-gray-600">Get your polished episode delivered fast</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startCloning()" class="w-full bg-black text-white font-heading font-medium text-lg py-4 rounded-xl shadow-hard hover:bg-slime-green hover:text-black transition-all">
+                    Submit My First Episode
+                </button>
+
+                <button onclick="closeSignupModal()" class="w-full bg-white border-2 border-black text-black font-heading font-medium py-3 rounded-xl shadow-hard hover:bg-gray-50 transition-all mt-3">
+                    I'll Do This Later
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-4 py-4 backdrop-blur-md bg-base-cream/90 border-b border-black">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <img src="logo.png" alt="Layo Edits" class="h-12 w-auto">
+            <button onclick="openSignupModal()" class="border border-black bg-transparent text-black px-6 py-2 rounded-full font-medium text-sm hover:bg-black hover:text-white transition-all duration-300">
+                Book a Session
+            </button>
+        </div>
+    </nav>
+
+    <!-- Sticky Pill -->
+    <div id="sticky-pill" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-transform duration-500">
+        <button onclick="openCloneModal()" class="bg-slime-green border border-black px-6 py-3 rounded-full font-heading font-medium shadow-hard text-sm flex items-center gap-2 hover:scale-105 active:scale-95 transition-all">
+            <i class="fa-solid fa-scissors"></i> Submit Episode
+        </button>
+    </div>
+
+    <!-- SECTION 01: HERO -->
+    <section class="relative min-h-screen flex flex-col justify-center overflow-hidden pt-24 pb-12 max-w-full">
+
+        <div class="relative z-20 text-center mb-12 px-4 pointer-events-none">
+            <div class="hero-badge inline-block bg-white border border-black px-4 py-1 rounded-full mb-6 shadow-hard-sm opacity-0 transform translate-y-4 pointer-events-auto">
+                <span class="font-medium text-xs uppercase tracking-widest text-gray-500">We're Ready When You Are</span>
+            </div>
+            <h1 class="font-heading font-light text-5xl md:text-8xl leading-[1.1] tracking-tight text-black">
+                <div class="hero-text-line">You focus on the content.</div>
+                <div class="hero-text-line-2 font-medium text-gray-400" data-headlines='["We love the edit.", "This is what we do.", "Leave the rest to us.", "We&apos;ve got you."]'></div>
+            </h1>
+        </div>
+
+        <!-- Infinite Carousel -->
+        <div class="relative w-full overflow-hidden py-4 max-w-full">
+            <div class="flex gap-6 px-4 w-max carousel-track">
+                <!-- Phone Card 1: Storytime -->
+                <div class="phone-card bg-black shadow-hard group">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-1.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">12k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">402</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@truecrimepod</div>
+                        <div class="text-xs opacity-80 font-light">Ngl I sent them a complete mess. Got back something I'm actually proud of.</div>
+                    </div>
+                </div>
+
+                <!-- Phone Card 2: Gaming -->
+                <div class="phone-card bg-black shadow-hard">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-2.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">45k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">1.2k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@mindsetmonday</div>
+                        <div class="text-xs opacity-80 font-light">I recorded next to an open window. They edited out a whole lawnmower. Legends.</div>
+                    </div>
+                </div>
+
+                <!-- Phone Card 3: Podcast -->
+                <div class="phone-card bg-black shadow-hard">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-3.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">2k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">89</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@thefounders</div>
+                        <div class="text-xs opacity-80 font-light">Sent 2 hours of chaos. Got back 45 minutes of magic. Same day.</div>
+                    </div>
+                </div>
+
+                <!-- Phone Card 4: Reaction -->
+                <div class="phone-card bg-black shadow-hard">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-4.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">89k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">3k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@womenwhobuild</div>
+                        <div class="text-xs opacity-80 font-light">They write my show notes better than I ever could. Genuinely annoying how good they are.</div>
+                    </div>
+                </div>
+
+                <!-- Phone Card 5: ASMR -->
+                <div class="phone-card bg-black shadow-hard">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-5.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">55k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">400</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@dailyhealth</div>
+                        <div class="text-xs opacity-80 font-light">My listeners think I upgraded my whole studio. I just found @layoedits ✨</div>
+                    </div>
+                </div>
+
+                <!-- Duplicate cards for seamless infinite loop -->
+                <!-- Duplicate 1: Storytime -->
+                <div class="phone-card bg-black shadow-hard group">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-1.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">12k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">402</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@truecrimepod</div>
+                        <div class="text-xs opacity-80 font-light">Ngl I sent them a complete mess. Got back something I'm actually proud of.</div>
+                    </div>
+                </div>
+
+                <!-- Duplicate 2: Gaming -->
+                <div class="phone-card bg-black shadow-hard">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-2.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">45k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">1.2k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@mindsetmonday</div>
+                        <div class="text-xs opacity-80 font-light">I recorded next to an open window. They edited out a whole lawnmower. Legends.</div>
+                    </div>
+                </div>
+
+                <!-- Duplicate 3: Podcast -->
+                <div class="phone-card bg-black shadow-hard">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-3.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">2k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">89</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@thefounders</div>
+                        <div class="text-xs opacity-80 font-light">Sent 2 hours of chaos. Got back 45 minutes of magic. Same day.</div>
+                    </div>
+                </div>
+
+                <!-- Duplicate 4: Reaction -->
+                <div class="phone-card bg-black shadow-hard">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-4.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">89k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">3k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@womenwhobuild</div>
+                        <div class="text-xs opacity-80 font-light">They write my show notes better than I ever could. Genuinely annoying how good they are.</div>
+                    </div>
+                </div>
+
+                <!-- Duplicate 5: ASMR -->
+                <div class="phone-card bg-black shadow-hard">
+                    <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                        <video src="carousel-5.mp4" autoplay loop muted playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    </div>
+                    <div class="tiktok-ui-right">
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-heart text-2xl"></i><span class="text-xs font-light">55k</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-regular fa-comment text-2xl"></i><span class="text-xs font-light">400</span></div>
+                        <div class="flex flex-col items-center"><i class="fa-solid fa-share text-2xl"></i><span class="text-xs font-light">Share</span></div>
+                    </div>
+                    <div class="tiktok-ui-bottom">
+                        <div class="font-medium text-sm mb-1">@dailyhealth</div>
+                        <div class="text-xs opacity-80 font-light">My listeners think I upgraded my whole studio. I just found @layoedits ✨</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center items-center mt-12 relative z-20">
+            <button onclick="openCloneModal()" class="bg-black text-white text-lg font-heading font-medium px-8 py-4 rounded-full shadow-hard hover:bg-neon-purple hover:text-black hover:-translate-y-1 hover:shadow-hard-hover transition-all">
+                Send Us Your First Episode
+            </button>
+        </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-wrapper overflow-hidden w-full">
+        <div class="bg-black text-white py-4 border-y border-black rotate-1 transform scale-105 z-20 relative">
+            <div class="marquee-container">
+                <div class="marquee-content font-heading font-normal text-xl uppercase tracking-widest">
+                    You Podcast It • Layo Edits It • Your Show Deserves It • Let's Go • You Podcast It • Layo Edits It • Your Show Deserves It • Let's Go •
+                    You Podcast It • Layo Edits It • Your Show Deserves It • Let's Go • You Podcast It • Layo Edits It • Your Show Deserves It • Let's Go •
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 02: WHY -->
+    <section class="pt-8 pb-16 px-4 max-w-7xl mx-auto overflow-hidden">
+        <h2 class="font-heading font-light text-4xl md:text-6xl text-center mb-6 tracking-tight">
+            THIS IS THE PART<br><span class="font-medium">WE LOVE DOING</span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="feature-card bg-white border border-black rounded-2xl p-8 shadow-hard hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,1)] transition-all duration-300">
+                <div class="text-2xl mb-6 bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center border border-black text-black">
+                    <i class="fa-solid fa-music"></i>
+                </div>
+                <h3 class="font-heading font-medium text-xl mb-3">Noise Removal</h3>
+                <p class="font-sans text-gray-600 font-light leading-relaxed">That AC hum, the neighbour's dog, the keyboard clicks — we catch every single one. Honestly? We kind of love hunting them down.</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="feature-card bg-white border border-black rounded-2xl p-8 shadow-hard hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(190,242,100,1)] transition-all duration-300">
+                <div class="text-2xl mb-6 bg-green-100 w-12 h-12 rounded-full flex items-center justify-center border border-black text-black">
+                    <i class="fa-solid fa-microphone"></i>
+                </div>
+                <h3 class="font-heading font-medium text-xl mb-3">Show Notes</h3>
+                <p class="font-sans text-gray-600 font-light leading-relaxed">Writing show notes is a chore for most people. For us, it's a vibe. We'll write them so well your listeners might actually read them.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="feature-card bg-white border border-black rounded-2xl p-8 shadow-hard hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(244,114,182,1)] transition-all duration-300">
+                <div class="text-2xl mb-6 bg-pink-100 w-12 h-12 rounded-full flex items-center justify-center border border-black text-black">
+                    <i class="fa-solid fa-handshake"></i>
+                </div>
+                <h3 class="font-heading font-medium text-xl mb-3">Transcription</h3>
+                <p class="font-sans text-gray-600 font-light leading-relaxed">Every word you said, written down with care. Great for SEO, accessibility, and turning one episode into a whole content strategy.</p>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="feature-card lg:col-span-2 bg-electric-blue border border-black rounded-2xl p-8 shadow-hard relative overflow-hidden group">
+                <div class="relative z-10 text-white">
+                    <div class="text-2xl mb-6 bg-black w-12 h-12 rounded-full flex items-center justify-center border border-white text-white">
+                        <i class="fa-solid fa-user-group"></i>
+                    </div>
+                    <h3 class="font-heading font-medium text-xl mb-3">Intros & Outros</h3>
+                    <p class="font-sans text-blue-50 font-light text-lg leading-relaxed">We'll craft a signature sound that makes every episode feel like the real deal — because it is. We genuinely nerd out over a good intro, and yours deserves that energy.</p>
+                </div>
+                <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-masks-theater text-9xl"></i>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="feature-card bg-slime-green border border-black rounded-2xl p-8 shadow-hard flex flex-col justify-center items-center text-center">
+                <h3 class="font-heading font-bold text-2xl mb-2">YOU JUST</h3>
+                <h3 class="font-heading font-bold text-2xl mb-2">HIT RECORD.</h3>
+                <h3 class="font-heading font-bold text-2xl mb-2">WE DO THE REST.</h3>
+                <div class="text-3xl mt-2 animate-bounce">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 03: HOW IT WORKS -->
+    <section class="how-it-works-section py-24 border-t border-black bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="bg-black text-white inline-block px-4 py-1 rounded-full font-heading font-medium text-xs mb-8 rotate-2 uppercase tracking-widest">The Process</div>
+
+            <div class="space-y-12 md:space-y-0 md:flex md:justify-between md:items-start gap-8">
+                <!-- Step 1 -->
+                <div class="step-item flex-1 text-center md:text-left">
+                    <div class="w-full h-48 bg-gray-50 border border-black rounded-xl mb-6 relative overflow-hidden flex items-center justify-center">
+                        <i class="fa-solid fa-cloud-arrow-up text-5xl text-gray-300"></i>
+                        <div class="absolute inset-0 bg-purple-100/50 translate-y-full step-fill-1 transition-transform"></div>
+                    </div>
+                    <h3 class="font-heading font-medium text-xl">1. Drop Your Raw Recording</h3>
+                    <p class="text-sm font-sans font-light text-gray-500 mt-2">Send us whatever you've got — messy, noisy, full of ums. We love it all. Seriously.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-item flex-1 text-center md:text-left mt-8 md:mt-0">
+                    <div class="w-full h-48 bg-gray-50 border border-black rounded-xl mb-6 relative overflow-hidden p-6 flex items-center justify-center">
+                        <div id="typewriter-text" class="font-heading font-medium text-xl text-center leading-tight"></div>
+                    </div>
+                    <h3 class="font-heading font-medium text-xl">2. We Get to Work ✦</h3>
+                    <p class="text-sm font-sans font-light text-gray-500 mt-2">This is genuinely our favourite bit. Trimming, cleaning, levelling, mixing — we nerd out so you don't have to.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-item flex-1 text-center md:text-left mt-8 md:mt-0">
+                    <div class="w-full h-48 bg-gray-50 border border-black rounded-xl mb-6 relative overflow-hidden flex items-center justify-center group cursor-pointer">
+                        <div class="bg-slime-green border border-black rounded-full w-16 h-16 flex items-center justify-center shadow-hard group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                    </div>
+                    <h3 class="font-heading font-medium text-xl">3. Press Publish & Take the Credit</h3>
+                    <p class="text-sm font-sans font-light text-gray-500 mt-2">Your polished episode lands in your inbox. No edits needed. Just hit publish and enjoy the compliments.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 03.5: YOUTUBE MOCKUP -->
+    <section class="py-24 px-4 bg-white border-t border-black overflow-hidden">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="font-heading font-light text-4xl md:text-6xl text-center mb-4 tracking-tight">
+                SEE THE <span class="font-medium">WORK.</span>
+            </h2>
+            <p class="text-center font-sans font-light text-gray-500 mb-4 text-lg">We specialise in one thing: making podcast episodes sound incredible.</p>
+            <p class="text-center font-sans font-light text-gray-400 mb-16">No generalist freelancers. No guesswork. Just a team that lives and breathes podcast editing — every cut, every level, every episode.</p>
+
+            <!-- macOS Desktop Mockup -->
+            <div class="rounded-2xl border-2 border-black shadow-[12px_12px_0px_0px_#000] overflow-hidden">
+
+                <!-- macOS Title Bar -->
+                <div class="bg-[#e8e8e8] border-b border-[#c0c0c0] px-4 py-2 flex items-center gap-2">
+                    <div class="flex gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e]"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]"></div>
+                    </div>
+                    <div class="flex-1 flex justify-center">
+                        <span class="text-xs text-gray-500 font-medium">YouTube</span>
+                    </div>
+                </div>
+
+                <!-- Browser Chrome -->
+                <div class="bg-[#f1f3f4] border-b border-[#dadce0] px-3 py-2 flex items-center gap-3">
+                    <!-- Back/Forward/Refresh -->
+                    <div class="flex items-center gap-1 text-gray-400">
+                        <button class="w-7 h-7 rounded-full hover:bg-gray-200 flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                        <button class="w-7 h-7 rounded-full hover:bg-gray-200 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        <button class="w-7 h-7 rounded-full hover:bg-gray-200 flex items-center justify-center"><i class="fa-solid fa-rotate-right text-xs"></i></button>
+                    </div>
+                    <!-- Address Bar -->
+                    <div class="flex-1 bg-white border border-[#dadce0] rounded-full px-4 py-1 flex items-center gap-2 text-xs text-gray-500">
+                        <i class="fa-solid fa-lock text-[10px] text-gray-400"></i>
+                        <span>youtube.com/watch?v=YUH5XavZ8Ns</span>
+                    </div>
+                </div>
+
+                <!-- YouTube UI -->
+                <div class="bg-white">
+                    <!-- YouTube Header -->
+                    <div class="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <button class="text-gray-600"><i class="fa-solid fa-bars text-lg"></i></button>
+                            <div class="flex items-center gap-1">
+                                <svg viewBox="0 0 90 20" class="h-5 w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M27.97 3.42A3.56 3.56 0 0 0 25.46 1C23.22.4 14 .4 14 .4S4.78.4 2.54 1A3.56 3.56 0 0 0 .03 3.42 37.4 37.4 0 0 0-.4 10a37.4 37.4 0 0 0 .43 6.58A3.56 3.56 0 0 0 2.54 19c2.24.6 11.46.6 11.46.6s9.22 0 11.46-.6a3.56 3.56 0 0 0 2.51-2.42A37.4 37.4 0 0 0 28.4 10a37.4 37.4 0 0 0-.43-6.58z" fill="#FF0000"/>
+                                    <path d="M11.2 14.3l7.6-4.3-7.6-4.3v8.6z" fill="white"/>
+                                    <text x="32" y="14" font-family="Arial" font-size="12" font-weight="bold" fill="#282828">YouTube</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex-1 max-w-md mx-4 hidden md:flex">
+                            <div class="flex w-full border border-gray-300 rounded-full overflow-hidden">
+                                <input type="text" value="podcast editing" class="flex-1 px-4 py-1 text-sm outline-none text-gray-700" readonly>
+                                <button class="bg-gray-100 border-l border-gray-300 px-4 text-gray-500"><i class="fa-solid fa-magnifying-glass text-sm"></i></button>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-600 text-lg">
+                            <i class="fa-solid fa-video hidden md:block"></i>
+                            <i class="fa-solid fa-bell hidden md:block"></i>
+                            <div class="w-8 h-8 rounded-full bg-neon-purple flex items-center justify-center text-white text-xs font-bold">L</div>
+                        </div>
+                    </div>
+
+                    <!-- Video + Sidebar -->
+                    <div class="flex gap-4 p-4">
+                        <!-- Main Video Column -->
+                        <div class="flex-1 min-w-0">
+                            <!-- Video Player -->
+                            <div class="relative bg-black rounded-xl overflow-hidden w-full" style="aspect-ratio: 16/9;">
+                                <video src="yt-demo.mp4" autoplay loop muted playsinline preload="auto" class="w-full h-full object-cover"></video>
+                                <!-- YouTube Controls Overlay -->
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-3 pb-2 pt-8">
+                                    <!-- Progress Bar -->
+                                    <div class="w-full h-1 bg-white/30 rounded-full mb-2 cursor-pointer">
+                                        <div class="h-full bg-red-500 rounded-full" style="width: 15%"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between text-white text-xs">
+                                        <div class="flex items-center gap-3">
+                                            <i class="fa-solid fa-play text-sm"></i>
+                                            <i class="fa-solid fa-forward-step text-sm"></i>
+                                            <i class="fa-solid fa-volume-high text-sm"></i>
+                                            <span class="font-mono">0:03 / 0:22</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-xs">HD</span>
+                                            <i class="fa-solid fa-gear text-sm"></i>
+                                            <i class="fa-solid fa-expand text-sm"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Video Info -->
+                            <div class="mt-3">
+                                <h3 class="font-medium text-gray-900 text-sm leading-snug">We Edited a Full Podcast Episode — Raw File to Finished Product | Layo Edits</h3>
+                                <div class="flex items-center justify-between mt-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-neon-purple flex items-center justify-center text-white text-xs font-bold">L</div>
+                                        <div>
+                                            <p class="text-xs font-medium text-gray-800">Layo Edits</p>
+                                            <p class="text-xs text-gray-500">48K subscribers</p>
+                                        </div>
+                                        <button class="bg-black text-white text-xs px-3 py-1 rounded-full font-medium">Subscribe</button>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex items-center bg-gray-100 rounded-full overflow-hidden">
+                                            <button class="flex items-center gap-1 px-3 py-1 text-xs font-medium hover:bg-gray-200 border-r border-gray-200">
+                                                <i class="fa-solid fa-thumbs-up"></i> <span>4.2K</span>
+                                            </button>
+                                            <button class="px-3 py-1 text-xs hover:bg-gray-200"><i class="fa-solid fa-thumbs-down"></i></button>
+                                        </div>
+                                        <button class="flex items-center gap-1 bg-gray-100 rounded-full px-3 py-1 text-xs font-medium hover:bg-gray-200">
+                                            <i class="fa-solid fa-share"></i> Share
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-3 bg-gray-100 rounded-xl p-3 text-xs text-gray-600">
+                                    <p class="font-medium text-gray-800 mb-1">312K views · 2 weeks ago</p>
+                                    <p>We specialise in podcast episode editing — and only that. Watch us take a raw, unedited episode and turn it into something your listeners will love. Noise removal, pacing, levels, show notes — the full works.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar Recommendations -->
+                        <div class="hidden lg:flex flex-col gap-3 w-64 flex-shrink-0">
+                            <div class="flex gap-2 cursor-pointer group">
+                                <div class="w-40 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200" style="aspect-ratio:16/9">
+                                    <div class="w-full h-full bg-gradient-to-br from-purple-300 to-purple-500 flex items-center justify-center">
+                                        <i class="fa-solid fa-headphones text-white text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-xs font-medium text-gray-800 leading-tight">Podcast Editing Tips — Before & After</p>
+                                    <p class="text-xs text-gray-500 mt-1">Layo Edits</p>
+                                    <p class="text-xs text-gray-400">89K views</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 cursor-pointer group">
+                                <div class="w-40 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200" style="aspect-ratio:16/9">
+                                    <div class="w-full h-full bg-gradient-to-br from-green-300 to-green-500 flex items-center justify-center">
+                                        <i class="fa-solid fa-scissors text-white text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-xs font-medium text-gray-800 leading-tight">How to Get Your Podcast Edited in 24 Hours</p>
+                                    <p class="text-xs text-gray-500 mt-1">Layo Edits</p>
+                                    <p class="text-xs text-gray-400">44K views</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 cursor-pointer group">
+                                <div class="w-40 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200" style="aspect-ratio:16/9">
+                                    <div class="w-full h-full bg-gradient-to-br from-pink-300 to-pink-500 flex items-center justify-center">
+                                        <i class="fa-solid fa-microphone text-white text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-xs font-medium text-gray-800 leading-tight">Show Notes That Actually Get Read</p>
+                                    <p class="text-xs text-gray-500 mt-1">Layo Edits</p>
+                                    <p class="text-xs text-gray-400">21K views</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 04: DEMO -->
+    <section class="py-24 px-4 bg-gray-50 border-y border-black transition-colors duration-500 overflow-hidden" id="demo-bg">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="font-heading font-light text-4xl md:text-6xl mb-4">HEAR THE DIFFERENCE</h2>
+            <p class="font-sans font-light text-gray-600 mb-12">This is what a little love and attention sounds like.</p>
+
+            <div class="relative bg-white border border-black rounded-2xl p-8 md:p-12 shadow-hard overflow-hidden">
+                <!-- Toggle Switch -->
+                <div class="flex justify-center mb-8">
+                    <div class="bg-gray-100 p-1 rounded-full border border-black flex relative cursor-pointer" id="voice-toggle">
+                        <div class="w-1/2 h-full absolute top-0 left-0 bg-white rounded-full border border-black shadow-sm transition-transform duration-300" id="toggle-knob" style="width: 50%; height: 100%; transform: scale(0.9) translateX(2px);"></div>
+                        <div class="z-10 px-6 py-2 font-heading font-medium text-sm relative select-none" id="label-orig">RAW</div>
+                        <div class="z-10 px-6 py-2 font-heading font-medium text-sm text-gray-400 relative select-none" id="label-clone">EDITED</div>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="flex items-center justify-center gap-2 h-32" id="demo-bars">
+                    <!-- Bars generated via JS -->
+                </div>
+
+                <div class="mt-8 font-mono text-xs text-gray-400 uppercase tracking-widest">Processing Audio...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 07: CTA -->
+    <section id="cta" class="py-24 px-4 bg-neon-purple border-t border-black relative overflow-hidden max-w-full">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-20"></div>
+
+        <div class="max-w-2xl mx-auto relative z-10 bg-white border border-black rounded-3xl p-8 md:p-12 shadow-[10px_10px_0px_0px_#000] text-center">
+            <h2 class="font-heading font-medium text-4xl md:text-5xl mb-6 uppercase tracking-tight">
+                Let's Make Your Show<br>Your Best Yet.
+            </h2>
+            <p class="font-sans font-light text-gray-600 text-lg mb-8 max-w-lg mx-auto">
+                Editing takes time, focus, and honestly — a bit of obsession. That's exactly what our team brings to every single episode. You create it. We'll take it from there, because this is what we love to do.
+            </p>
+
+            <button onclick="openSignupModal()" class="w-full bg-black text-white font-heading font-medium text-xl py-5 rounded-xl shadow-hard hover:bg-slime-green hover:text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard-hover transition-all mb-4">
+                Send Us Your First Episode
+            </button>
+
+            <p class="text-sm text-gray-500 font-light">
+                First episode is on us • No contracts • Just good vibes
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-black text-white py-12 border-t border-white/10 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-center md:text-left">
+                <img src="logo.png" alt="Layo Edits" class="h-16 w-auto mx-auto md:mx-0 mb-3 brightness-0 invert">
+                <p class="text-gray-400 text-sm font-light">Podcasting made with love.</p>
+            </div>
+
+            <div class="flex gap-6">
+                <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all hover:-translate-y-1"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all hover:-translate-y-1"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all hover:-translate-y-1"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+        </div>
+
+        <!-- Legal Links -->
+        <div class="text-center mt-8">
+            <div class="flex justify-center gap-6 text-sm">
+                <a href="terms.html" class="text-gray-400 hover:text-white transition-colors underline">Terms of Service</a>
+                <a href="privacy.html" class="text-gray-400 hover:text-white transition-colors underline">Privacy Policy</a>
+            </div>
+        </div>
+
+        <div class="text-center mt-6 text-gray-600 text-xs font-light">
+            © 2026 Layo Edits. Built for Podcasters.
+        </div>
+    </footer>
+
+    <!-- GSAP Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+
+    <script>
+        // Force scroll to top - immediate execution
+        history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+
+        // Also on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            }, 0);
+        });
+
+        // And on full page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            }, 100);
+        });
+
+        // Mobile video autoplay fix - play videos when they come into view
+        document.addEventListener('DOMContentLoaded', function() {
+            const videos = document.querySelectorAll('video[autoplay]');
+
+            // Try to play immediately (works on some browsers)
+            videos.forEach(video => {
+                video.play().catch(err => {
+                    // Autoplay failed, will use Intersection Observer
+                    console.log('Autoplay prevented, using intersection observer');
+                });
+            });
+
+            // Use Intersection Observer for mobile browsers that block autoplay
+            const observerOptions = {
+                threshold: 0.5 // Play when 50% of video is visible
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target;
+                    if (entry.isIntersecting) {
+                        video.play().catch(err => console.log('Play failed:', err));
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, observerOptions);
+
+            videos.forEach(video => observer.observe(video));
+        });
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>

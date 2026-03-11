@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+# Legacy unused videos
+podcast.mp4
+gaming.mp4
+crisp-audio.mp4
+meme-dub.mp4
+storytime.mp4
+# Raw download files
+yt-demo-raw*
