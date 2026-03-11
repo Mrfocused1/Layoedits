@@ -253,9 +253,414 @@
         .modal.active {
             display: flex;
         }
+
+        /* ═══════════════════════════════════════
+           INTRO LOADER
+        ═══════════════════════════════════════ */
+        #intro-loader {
+            position: fixed;
+            inset: 0;
+            background: #080808;
+            z-index: 99999;
+            overflow: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Phase 1 – brand */
+        #ldr-brand {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s ease;
+        }
+        #ldr-brand-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.75rem;
+        }
+        #ldr-title {
+            display: flex;
+            align-items: center;
+        }
+        .ldr-word {
+            font-size: clamp(3rem, 13vw, 9rem);
+            font-weight: 500;
+            color: #fff;
+            letter-spacing: -0.03em;
+            opacity: 0;
+            transition: opacity 0.52s ease, transform 0.58s cubic-bezier(0.16,1,0.3,1);
+        }
+        #ldr-tl { transform: translateX(-22px); }
+        #ldr-tr { transform: translateX(22px); transition-delay: 0.07s; }
+        .ldr-word.show { opacity: 1; transform: translateX(0) !important; }
+
+        /* Green cut-line between words */
+        #ldr-tc {
+            width: 2px;
+            height: clamp(2.4rem, 9vw, 6.5rem);
+            background: #bef264;
+            margin: 0 10px;
+            transform: scaleY(0);
+            transform-origin: center;
+            transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1) 0.44s;
+            box-shadow: 0 0 12px rgba(190,242,100,0.45);
+        }
+        #ldr-tc.show { transform: scaleY(1); }
+
+        #ldr-tag {
+            font-size: 0.6rem;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: #2a2a2a;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.88s;
+        }
+        #ldr-tag.show { opacity: 1; }
+
+        /* Editing timeline */
+        #ldr-tl-wrap {
+            width: clamp(260px, 56vw, 580px);
+            opacity: 0;
+            transform: translateY(7px);
+            transition: opacity 0.45s ease 0.82s, transform 0.45s ease 0.82s;
+        }
+        #ldr-tl-wrap.show { opacity: 1; transform: translateY(0); }
+
+        #ldr-waveform {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 18px;
+            margin-bottom: 4px;
+            opacity: 0.28;
+            overflow: hidden;
+        }
+
+        #ldr-track {
+            height: 30px;
+            background: #111;
+            border-radius: 4px;
+            position: relative;
+            border: 1px solid #1c1c1c;
+            overflow: hidden;
+        }
+        .ldr-clip {
+            position: absolute;
+            top: 3px;
+            height: calc(100% - 6px);
+            border-radius: 3px;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.28s ease;
+            opacity: 0.9;
+        }
+        .ldr-clip.show { transform: scaleX(1); }
+        #lc1 { background: #a855f7; }
+        #lc2 { background: #bef264; }
+        #lc3 { background: #f472b6; }
+        #lc4 { background: #3b82f6; }
+        #lc5 { background: #facc15; }
+
+        .ldr-cut {
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 1px;
+            background: #080808;
+            z-index: 4;
+        }
+        #ldr-ph {
+            position: absolute;
+            top: -3px; bottom: -3px;
+            width: 2px;
+            background: #fff;
+            left: 0;
+            z-index: 8;
+            box-shadow: 0 0 8px rgba(255,255,255,0.6);
+        }
+        #ldr-ph::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: -4px;
+            border: 5px solid transparent;
+            border-top-color: #fff;
+            border-bottom: none;
+        }
+        #ldr-tcodes {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        #ldr-tcodes span {
+            font-size: 0.44rem;
+            letter-spacing: 0.06em;
+            color: #1e1e1e;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Phase 2 – loading % */
+        #ldr-pct {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #ldr-pct.show { opacity: 1; pointer-events: auto; }
+
+        #ldr-num {
+            display: flex;
+            align-items: flex-start;
+            line-height: 1;
+        }
+        #ldr-val {
+            font-size: clamp(6rem, 24vw, 15rem);
+            font-weight: 300;
+            color: #fff;
+            letter-spacing: -0.05em;
+            font-variant-numeric: tabular-nums;
+        }
+        #ldr-sym {
+            font-size: clamp(2rem, 7vw, 4.5rem);
+            font-weight: 300;
+            color: #bef264;
+            margin-top: 0.3em;
+        }
+        #ldr-pct-lbl {
+            font-size: 0.6rem;
+            letter-spacing: 0.26em;
+            text-transform: uppercase;
+            color: #232323;
+            margin-top: 0.7rem;
+        }
+        #ldr-bar-track {
+            position: absolute;
+            bottom: 0;
+            left: 0; right: 0;
+            height: 3px;
+            background: #111;
+        }
+        #ldr-bar-fill {
+            height: 100%;
+            background: #bef264;
+            width: 0%;
+            box-shadow: 0 0 10px rgba(190,242,100,0.4);
+        }
     </style>
 </head>
 <body class="relative">
+
+    <!-- ════════════════════════════════════════
+         INTRO LOADER
+    ════════════════════════════════════════ -->
+    <div id="intro-loader" aria-hidden="true">
+
+        <!-- Phase 1: Brand reveal -->
+        <div id="ldr-brand">
+            <div id="ldr-brand-inner">
+                <div id="ldr-title">
+                    <span id="ldr-tl" class="ldr-word">LAYO</span>
+                    <span id="ldr-tc"></span>
+                    <span id="ldr-tr" class="ldr-word">EDITS</span>
+                </div>
+                <div id="ldr-tag">Podcast Editing Studio</div>
+                <div id="ldr-tl-wrap">
+                    <div id="ldr-waveform"></div>
+                    <div id="ldr-track">
+                        <div class="ldr-clip" id="lc1" style="left:2%;width:18%"></div>
+                        <div class="ldr-cut" style="left:20%"></div>
+                        <div class="ldr-clip" id="lc2" style="left:21%;width:15%"></div>
+                        <div class="ldr-cut" style="left:36%"></div>
+                        <div class="ldr-clip" id="lc3" style="left:37%;width:22%"></div>
+                        <div class="ldr-cut" style="left:59%"></div>
+                        <div class="ldr-clip" id="lc4" style="left:60%;width:13%"></div>
+                        <div class="ldr-cut" style="left:73%"></div>
+                        <div class="ldr-clip" id="lc5" style="left:74%;width:24%"></div>
+                        <div id="ldr-ph"></div>
+                    </div>
+                    <div id="ldr-tcodes">
+                        <span>00:00:00:00</span>
+                        <span>00:01:00:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Loading % -->
+        <div id="ldr-pct">
+            <div id="ldr-num">
+                <span id="ldr-val">0</span><span id="ldr-sym">%</span>
+            </div>
+            <div id="ldr-pct-lbl">Loading your experience</div>
+            <div id="ldr-bar-track"><div id="ldr-bar-fill"></div></div>
+        </div>
+
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        var BRAND_MS     = 1900;  // brand phase duration before switching to %
+        var MIN_COUNT_MS = 1500;  // min time showing % counter before dismissal allowed
+        var VIDEOS = ['carousel-1.mp4','carousel-2.mp4','carousel-3.mp4','carousel-4.mp4','carousel-5.mp4'];
+
+        var loaded = 0, allReady = false, minDone = false;
+        var curPct = 0, tgtPct = 0, dismissed = false;
+
+        // Lock scroll while loader is up
+        document.documentElement.style.overflow = 'hidden';
+
+        // Preload carousel videos in background
+        VIDEOS.forEach(function (src) {
+            var v = document.createElement('video');
+            v.preload = 'auto'; v.muted = true; v.playsInline = true; v.src = src;
+            v.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;';
+            document.body.appendChild(v);
+            function done() {
+                loaded++;
+                tgtPct = Math.round(loaded / VIDEOS.length * 100);
+                if (loaded >= VIDEOS.length) { allReady = true; tryDismiss(); }
+            }
+            v.addEventListener('canplaythrough', done, { once: true });
+            v.addEventListener('error', done, { once: true });
+            v.load();
+        });
+
+        // Safety: force dismiss after 12s in case videos never fire events
+        setTimeout(function () { if (!allReady) { allReady = true; tryDismiss(); } }, 12000);
+
+        // Generate waveform bars
+        var wvEl = document.getElementById('ldr-waveform');
+        if (wvEl) {
+            [4,7,10,13,11,8,5,4,6,9,12,14,11,8,5,3,5,8,11,13,10,7,4,3,6,10,14,12,9,6,4,5,7,10,12,10,7,4,3,5,8,11,13,10,7,5,4,6,9,12,11,8,5,3].forEach(function (h) {
+                var b = document.createElement('div');
+                b.style.cssText = 'width:2px;height:' + h + 'px;background:#2a2a2a;border-radius:1px;flex-shrink:0;';
+                wvEl.appendChild(b);
+            });
+        }
+
+        // Phase 1 – animate brand text in
+        setTimeout(function () {
+            var tl = document.getElementById('ldr-tl');
+            var tr = document.getElementById('ldr-tr');
+            var tc = document.getElementById('ldr-tc');
+            if (tl) tl.classList.add('show');
+            if (tr) tr.classList.add('show');
+            if (tc) tc.classList.add('show');
+        }, 180);
+
+        setTimeout(function () {
+            var tag = document.getElementById('ldr-tag');
+            var tlw = document.getElementById('ldr-tl-wrap');
+            if (tag) tag.classList.add('show');
+            if (tlw) tlw.classList.add('show');
+            // Stagger clips in
+            ['lc1','lc2','lc3','lc4','lc5'].forEach(function (id, i) {
+                setTimeout(function () {
+                    var el = document.getElementById(id);
+                    if (el) el.classList.add('show');
+                }, i * 100);
+            });
+            // Scrub playhead across the timeline
+            setTimeout(scrubPlayhead, 60);
+        }, 720);
+
+        function scrubPlayhead() {
+            var ph = document.getElementById('ldr-ph');
+            if (!ph) return;
+            var t0 = performance.now(), dur = 1100;
+            (function frame(now) {
+                var p = Math.min((now - t0) / dur, 1);
+                var e = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p; // ease-in-out
+                ph.style.left = (e * 97) + '%';
+                if (p < 1) requestAnimationFrame(frame);
+            })(t0);
+        }
+
+        // Switch to loading phase after brand phase
+        setTimeout(startPct, BRAND_MS);
+
+        function startPct() {
+            var brand  = document.getElementById('ldr-brand');
+            var pctEl  = document.getElementById('ldr-pct');
+            var loader = document.getElementById('intro-loader');
+
+            // Flash-cut effect (like a hard cut in video editing)
+            var flash = document.createElement('div');
+            flash.style.cssText = 'position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:20;';
+            loader.appendChild(flash);
+
+            requestAnimationFrame(function () {
+                flash.style.transition = 'opacity 0.06s';
+                flash.style.opacity = '0.6';
+                setTimeout(function () {
+                    flash.style.opacity = '0';
+                    brand.style.opacity = '0';
+                    setTimeout(function () {
+                        brand.style.display = 'none';
+                        if (pctEl) pctEl.classList.add('show');
+                        runCounter();
+                        setTimeout(function () { minDone = true; tryDismiss(); }, MIN_COUNT_MS);
+                    }, 180);
+                    setTimeout(function () { flash.remove(); }, 400);
+                }, 65);
+            });
+        }
+
+        function runCounter() {
+            var t0 = performance.now();
+            var valEl  = document.getElementById('ldr-val');
+            var fillEl = document.getElementById('ldr-bar-fill');
+            (function tick(now) {
+                var elapsed = now - t0;
+                // Auto-advance floor: 0→75 in ~900ms, then crawls 75→95 slowly
+                var floor = elapsed < 900
+                    ? (elapsed / 900) * 75
+                    : 75 + ((elapsed - 900) / 4000) * 20;
+                var ceiling = allReady ? 100 : 99;
+                var target  = Math.min(Math.max(floor, tgtPct), ceiling);
+
+                if (curPct < target) {
+                    curPct = Math.min(curPct + Math.max(0.25, (target - curPct) * 0.07), target);
+                }
+
+                var display = Math.floor(curPct);
+                if (valEl)  valEl.textContent  = display;
+                if (fillEl) fillEl.style.width = display + '%';
+
+                if (curPct >= 100) { tryDismiss(); return; }
+                requestAnimationFrame(tick);
+            })(t0);
+        }
+
+        function tryDismiss() {
+            if (dismissed || !allReady || !minDone || curPct < 100) return;
+            dismissed = true;
+            dismiss();
+        }
+
+        function dismiss() {
+            var loader = document.getElementById('intro-loader');
+            if (!loader) return;
+            // Wipe up — editorial exit
+            loader.style.transition = 'transform 0.65s cubic-bezier(0.76,0,0.24,1)';
+            loader.style.transform  = 'translateY(-100%)';
+            setTimeout(function () {
+                loader.remove();
+                document.documentElement.style.overflow = '';
+            }, 680);
+        }
+
+    }());
+    </script>
 
     <!-- Custom Cursor -->
     <div class="cursor-follow hidden md:block"></div>
