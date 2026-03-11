@@ -512,30 +512,74 @@
         var MIN_COUNT_MS = 1500;  // min time showing % counter before dismissal allowed
         var VIDEOS = ['carousel-1.mp4','carousel-2.mp4','carousel-3.mp4','carousel-4.mp4','carousel-5.mp4'];
 
-        var loaded = 0, allReady = false, minDone = false;
+        var allReady = false, minDone = false;
         var curPct = 0, tgtPct = 0, dismissed = false;
+
+        // Per-video byte progress (0.0 – 1.0)
+        var videoProgress = [0, 0, 0, 0, 0];
+        var videoDone     = [false, false, false, false, false];
 
         // Lock scroll while loader is up
         document.documentElement.style.overflow = 'hidden';
 
-        // Preload carousel videos in background
-        VIDEOS.forEach(function (src) {
-            var v = document.createElement('video');
-            v.preload = 'auto'; v.muted = true; v.playsInline = true; v.src = src;
-            v.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;';
-            document.body.appendChild(v);
-            function done() {
-                loaded++;
-                tgtPct = Math.round(loaded / VIDEOS.length * 100);
-                if (loaded >= VIDEOS.length) { allReady = true; tryDismiss(); }
-            }
-            v.addEventListener('canplaythrough', done, { once: true });
-            v.addEventListener('error', done, { once: true });
-            v.load();
+        // Download each video via XHR — guarantees full data before dismissal
+        // and gives accurate byte-level progress for the % counter.
+        // On completion the carousel <video> src is swapped to a blob URL so
+        // playback starts instantly from memory with no re-fetch.
+        VIDEOS.forEach(function (src, idx) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', src, true);
+            xhr.responseType = 'arraybuffer';
+
+            xhr.onprogress = function (e) {
+                videoProgress[idx] = e.lengthComputable && e.total > 0
+                    ? e.loaded / e.total
+                    : 0.5; // indeterminate: hold at 50% until complete
+                recalcTarget();
+            };
+
+            xhr.onload = function () {
+                videoProgress[idx] = 1;
+                videoDone[idx] = true;
+                recalcTarget();
+
+                // Swap every carousel <video> with this src to a blob URL
+                var blob    = new Blob([xhr.response], { type: 'video/mp4' });
+                var blobUrl = URL.createObjectURL(blob);
+                document.querySelectorAll('video[src="' + src + '"]').forEach(function (v) {
+                    v.src = blobUrl;
+                    v.load();
+                    v.play().catch(function () {}); // re-trigger autoplay
+                });
+
+                if (videoDone.every(function (d) { return d; })) {
+                    allReady = true;
+                    tryDismiss();
+                }
+            };
+
+            xhr.onerror = xhr.ontimeout = function () {
+                // On failure treat as "done" so we never hang forever
+                videoProgress[idx] = 1;
+                videoDone[idx] = true;
+                recalcTarget();
+                if (videoDone.every(function (d) { return d; })) {
+                    allReady = true;
+                    tryDismiss();
+                }
+            };
+
+            xhr.send();
         });
 
-        // Safety: force dismiss after 12s in case videos never fire events
-        setTimeout(function () { if (!allReady) { allReady = true; tryDismiss(); } }, 12000);
+        function recalcTarget() {
+            var sum = videoProgress.reduce(function (a, b) { return a + b; }, 0);
+            tgtPct = Math.round((sum / VIDEOS.length) * 100);
+        }
+
+        // Hard safety cap: if XHR events never fire (e.g. service worker cache),
+        // force dismiss after 20 s so users are never permanently stuck.
+        setTimeout(function () { if (!allReady) { allReady = true; tryDismiss(); } }, 20000);
 
         // Generate waveform bars
         var wvEl = document.getElementById('ldr-waveform');
@@ -616,20 +660,16 @@
         }
 
         function runCounter() {
-            var t0 = performance.now();
             var valEl  = document.getElementById('ldr-val');
             var fillEl = document.getElementById('ldr-bar-fill');
-            (function tick(now) {
-                var elapsed = now - t0;
-                // Auto-advance floor: 0→75 in ~900ms, then crawls 75→95 slowly
-                var floor = elapsed < 900
-                    ? (elapsed / 900) * 75
-                    : 75 + ((elapsed - 900) / 4000) * 20;
+            (function tick() {
+                // Chase the real download progress; cap at 99 until fully done
                 var ceiling = allReady ? 100 : 99;
-                var target  = Math.min(Math.max(floor, tgtPct), ceiling);
+                var target  = Math.min(tgtPct, ceiling);
 
                 if (curPct < target) {
-                    curPct = Math.min(curPct + Math.max(0.25, (target - curPct) * 0.07), target);
+                    // Ease toward target — faster when far, smoother when close
+                    curPct = Math.min(curPct + Math.max(0.3, (target - curPct) * 0.06), target);
                 }
 
                 var display = Math.floor(curPct);
@@ -638,7 +678,7 @@
 
                 if (curPct >= 100) { tryDismiss(); return; }
                 requestAnimationFrame(tick);
-            })(t0);
+            })();
         }
 
         function tryDismiss() {
