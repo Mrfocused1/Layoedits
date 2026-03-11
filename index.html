@@ -722,95 +722,55 @@
                 <details class="mb-6 border-2 border-black rounded-xl overflow-hidden">
                     <summary class="bg-gray-50 px-4 py-3 cursor-pointer font-heading font-medium flex items-center gap-2 hover:bg-gray-100 transition-colors">
                         <i class="fa-solid fa-lightbulb text-yellow-500"></i>
-                        Tips for Best Edit Results
+                        How to share your episode
                         <i class="fa-solid fa-chevron-down ml-auto text-sm"></i>
                     </summary>
                     <div class="p-4 bg-white space-y-2">
                         <div class="flex items-start gap-3">
-                            <i class="fa-solid fa-volume-xmark text-gray-400 mt-1"></i>
-                            <p class="text-sm text-gray-600 font-light">Film or record wherever works for you — we'll clean everything up</p>
+                            <i class="fa-brands fa-dropbox text-blue-500 mt-1"></i>
+                            <p class="text-sm text-gray-600 font-light">Upload to Dropbox and paste the share link below</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-brands fa-google-drive text-yellow-500 mt-1"></i>
+                            <p class="text-sm text-gray-600 font-light">Google Drive works great — make sure sharing is set to "Anyone with the link"</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-link text-gray-400 mt-1"></i>
+                            <p class="text-sm text-gray-600 font-light">WeTransfer, OneDrive, iCloud Drive — any share link works</p>
                         </div>
                         <div class="flex items-start gap-3">
                             <i class="fa-solid fa-microphone-lines text-gray-400 mt-1"></i>
-                            <p class="text-sm text-gray-600 font-light">Any podcast setup works — solo, co-hosted, remote guest, we edit it all</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <i class="fa-solid fa-clock text-gray-400 mt-1"></i>
-                            <p class="text-sm text-gray-600 font-light">Files under 2GB are ideal for fast upload and turnaround</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <i class="fa-solid fa-ban text-gray-400 mt-1"></i>
-                            <p class="text-sm text-gray-600 font-light">Include edit notes in the instructions box after upload</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <i class="fa-solid fa-layer-group text-gray-400 mt-1"></i>
-                            <p class="text-sm text-gray-600 font-light">MP3, WAV, M4A, MP4, and MOV — we accept every podcast format</p>
+                            <p class="text-sm text-gray-600 font-light">Any format, any setup — solo, co-hosted, remote guest, we edit it all</p>
                         </div>
                     </div>
                 </details>
 
-                <!-- Tab Buttons -->
-                <div class="flex gap-2 mb-6">
-                    <button id="upload-tab-btn" onclick="switchToUpload()" class="flex-1 py-3 px-4 font-heading font-medium border-2 border-black rounded-xl bg-black text-white transition-all">
-                        <i class="fa-solid fa-upload mr-2"></i> Upload File
-                    </button>
-                    <button id="record-tab-btn" onclick="switchToRecord()" class="flex-1 py-3 px-4 font-heading font-medium border-2 border-black rounded-xl bg-white text-black hover:bg-gray-50 transition-all">
-                        <i class="fa-solid fa-microphone mr-2"></i> Record Episode
-                    </button>
-                </div>
-
-                <!-- Upload Section -->
-                <div id="upload-section">
-                    <div class="border-2 border-dashed border-black rounded-2xl p-8 text-center mb-6 hover:bg-gray-50 transition-colors cursor-pointer" id="upload-zone">
-                        <i class="fa-solid fa-cloud-arrow-up text-5xl text-gray-300 mb-4 pointer-events-none"></i>
-                        <p class="font-heading font-medium mb-2 pointer-events-none">Drop your podcast episode here or click to upload</p>
-                        <p class="text-sm text-gray-500 font-light pointer-events-none">MP3, WAV, M4A, MP4 (max 500MB)</p>
-                        <input type="file" id="voice-file" accept="audio/*" class="hidden">
+                <!-- Episode Link Input -->
+                <div class="mb-6">
+                    <label class="font-heading font-medium text-sm uppercase mb-2 block">Episode File Link</label>
+                    <div class="relative">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                            <i class="fa-solid fa-link"></i>
+                        </div>
+                        <input
+                            type="url"
+                            id="episode-link"
+                            placeholder="Paste your Dropbox, Google Drive or WeTransfer link..."
+                            class="w-full border-2 border-black rounded-xl pl-10 pr-4 py-4 font-sans font-light focus:outline-none focus:ring-2 focus:ring-slime-green transition-all"
+                            oninput="onLinkInput()"
+                        >
                     </div>
-                </div>
-
-                <!-- Record Section -->
-                <div id="record-section" class="hidden">
-                    <div class="border-2 border-black rounded-2xl p-8 text-center mb-6 bg-gray-50">
-                        <div id="record-idle" class="record-state">
-                            <i class="fa-solid fa-microphone text-5xl text-gray-300 mb-4"></i>
-                            <p class="font-heading font-medium mb-2">Record a quick episode preview</p>
-                            <p class="text-sm text-gray-500 font-light mb-4">Hit the button and talk for 30 seconds — just like you do on your podcast</p>
-                        </div>
-
-                        <div id="record-active" class="record-state hidden">
-                            <div class="flex justify-center items-center gap-2 mb-4">
-                                <div class="w-2 h-8 bg-red-500 rounded-full animate-pulse"></div>
-                                <div class="w-2 h-12 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
-                                <div class="w-2 h-16 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
-                                <div class="w-2 h-12 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.3s"></div>
-                                <div class="w-2 h-8 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
-                            </div>
-                            <p class="font-heading font-medium text-2xl mb-2">Recording...</p>
-                            <p class="text-3xl font-mono font-bold text-red-500" id="record-timer">00:30</p>
-                            <p class="text-sm text-gray-500 font-light mt-2">Talk naturally — just like you do on your podcast</p>
-                        </div>
-
-                        <div id="record-complete" class="record-state hidden">
-                            <i class="fa-solid fa-check-circle text-5xl text-slime-green mb-4"></i>
-                            <p class="font-heading font-medium mb-2">Recording complete!</p>
-                            <p class="text-sm text-gray-500 font-light mb-4" id="record-duration">30-second episode preview captured</p>
-
-                            <!-- Audio Playback -->
-                            <div class="bg-white border-2 border-black rounded-xl p-4 mb-4">
-                                <audio id="recorded-audio-playback" controls class="w-full">
-                                    Your browser does not support the audio element.
-                                </audio>
-                            </div>
-
-                            <p class="text-xs text-gray-500 font-light">
-                                <i class="fa-solid fa-play-circle mr-1"></i> Play it back before continuing
-                            </p>
-                        </div>
-
-                        <button onclick="toggleRecording()" id="record-btn" class="mt-4 bg-red-500 text-white font-heading font-medium text-lg py-3 px-8 rounded-full shadow-hard hover:bg-red-600 transition-all">
-                            <i class="fa-solid fa-circle mr-2"></i> Start Recording
-                        </button>
+                    <!-- Quick-access service buttons -->
+                    <div class="flex gap-2 mt-3">
+                        <a href="https://www.dropbox.com" target="_blank" rel="noopener" class="flex items-center gap-2 border border-black rounded-full px-4 py-1.5 text-xs font-medium hover:bg-black hover:text-white transition-all">
+                            <i class="fa-brands fa-dropbox text-blue-500"></i> Dropbox
+                        </a>
+                        <a href="https://drive.google.com" target="_blank" rel="noopener" class="flex items-center gap-2 border border-black rounded-full px-4 py-1.5 text-xs font-medium hover:bg-black hover:text-white transition-all">
+                            <i class="fa-brands fa-google-drive text-yellow-500"></i> Google Drive
+                        </a>
+                        <a href="https://wetransfer.com" target="_blank" rel="noopener" class="flex items-center gap-2 border border-black rounded-full px-4 py-1.5 text-xs font-medium hover:bg-black hover:text-white transition-all">
+                            <i class="fa-solid fa-paper-plane text-gray-500"></i> WeTransfer
+                        </a>
                     </div>
                 </div>
 

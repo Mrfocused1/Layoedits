@@ -345,20 +345,17 @@ document.addEventListener('mouseleave', () => {
 
 // Modal Management
 function openCloneModal() {
-    console.log('[openCloneModal] Opening clone modal...');
     const modal = document.getElementById('clone-modal');
-    if (!modal) {
-        console.error('[openCloneModal] Clone modal element not found!');
-        return;
-    }
+    if (!modal) return;
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    console.log('[openCloneModal] Modal opened successfully');
+}
 
-    // Ensure file upload listeners are attached when modal opens
-    setTimeout(() => {
-        setupFileUpload();
-    }, 100);
+// Enable/disable Continue button based on link input
+function onLinkInput() {
+    const link = (document.getElementById('episode-link')?.value || '').trim();
+    const btn  = document.getElementById('upload-btn');
+    if (btn) btn.disabled = link.length === 0;
 }
 
 function closeCloneModal() {
@@ -451,7 +448,8 @@ function resetCloneModal() {
     document.getElementById('clone-step-1').classList.remove('hidden');
     document.getElementById('clone-step-2').classList.add('hidden');
     document.getElementById('clone-step-3').classList.add('hidden');
-    document.getElementById('voice-file').value = '';
+    const linkEl = document.getElementById('episode-link');
+    if (linkEl) linkEl.value = '';
     document.getElementById('script-text').value = '';
     document.getElementById('upload-btn').disabled = true;
     document.getElementById('upload-progress').classList.add('hidden');
@@ -466,69 +464,8 @@ function resetCloneModal() {
         transcriptionCharCountEl.textContent = '0/500';
     }
 
-    // Reset upload zone
-    const uploadZone = document.getElementById('upload-zone');
-    // Clear existing handler reference since we're replacing content
-    if (uploadZone) {
-        uploadZone._clickHandler = null;
-    }
-    uploadZone.innerHTML = `
-        <i class="fa-solid fa-cloud-arrow-up text-5xl text-gray-300 mb-4 pointer-events-none"></i>
-        <p class="font-heading font-medium mb-2 pointer-events-none">Drop audio file here or click to upload</p>
-        <p class="text-sm text-gray-500 font-light pointer-events-none">MP3, WAV, M4A (max 10MB)</p>
-        <input type="file" id="voice-file" accept="audio/*" class="hidden">
-    `;
-
-    // Reset recording UI
-    document.getElementById('record-idle').classList.remove('hidden');
-    document.getElementById('record-active').classList.add('hidden');
-    document.getElementById('record-complete').classList.add('hidden');
-    document.getElementById('record-btn').innerHTML = '<i class="fa-solid fa-circle mr-2"></i> Start Recording';
-    document.getElementById('record-btn').classList.add('bg-red-500', 'hover:bg-red-600');
-    document.getElementById('record-btn').classList.remove('bg-black', 'hover:bg-gray-800');
-    document.getElementById('record-timer').textContent = '00:30';
-
-    // Clean up audio player
-    const audioPlayer = document.getElementById('recorded-audio-playback');
-    if (audioPlayer.src) {
-        URL.revokeObjectURL(audioPlayer.src);
-        audioPlayer.src = '';
-    }
-
-    // Stop any ongoing recording
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-        clearInterval(recordingTimer);
-    }
-
-    // Switch back to upload tab
-    switchToUpload();
-
-    // Re-attach event listeners (use setTimeout to ensure DOM is ready after innerHTML replacement)
-    setTimeout(() => {
-        setupFileUpload();
-    }, 0);
-
-    selectedFile = null;
     currentModelId = null;
     currentAudioUrl = null;
-    autoTranscribedText = null;
-    transcriptionInProgress = false;
-
-    // Remove any transcription status messages
-    const statusEl = document.getElementById('transcription-status');
-    if (statusEl) {
-        statusEl.remove();
-    }
-
-    // Reset transcription badge
-    updateTranscriptionBadgeAvailability();
-
-    // Reset transcription textarea styling (reuse transcriptionTextEl from above)
-    if (transcriptionTextEl) {
-        transcriptionTextEl.classList.remove('border-blue-400', 'bg-blue-50', 'border-green-400');
-        transcriptionTextEl.placeholder = 'Upload audio or record to auto-transcribe... or type what you said manually';
-    }
 }
 
 // File Upload Handler
@@ -1341,165 +1278,20 @@ function stopRecording() {
 }
 
 // Upload Voice to Fish Audio API with cross-browser format handling
-async function uploadVoice() {
-    if (!selectedFile) {
-        alert('Please select an audio file first');
+function uploadVoice() {
+    const link = (document.getElementById('episode-link')?.value || '').trim();
+    if (!link) {
+        alert('Please paste a link to your episode file first.');
         return;
     }
 
-    const uploadBtn = document.getElementById('upload-btn');
-    const progressDiv = document.getElementById('upload-progress');
-    const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
+    // Generate a reference ID from the link
+    currentModelId = 'EP-' + Date.now();
 
-    uploadBtn.disabled = true;
-    progressDiv.classList.remove('hidden');
-
-    // Log file details for debugging
-    console.log('=== Starting Upload ===');
-    console.log('File name:', selectedFile.name);
-    console.log('File type:', selectedFile.type);
-    console.log('File size:', (selectedFile.size / 1024).toFixed(2), 'KB');
-    console.log('Browser:', detectBrowser());
-
-    try {
-        // Create FormData
-        const formData = new FormData();
-        formData.append('audio', selectedFile);
-        formData.append('name', `Voice Clone ${Date.now()}`);
-
-        // Get transcription text if provided (improves clone quality)
-        const transcriptionTextEl = document.getElementById('transcription-text');
-        const transcriptionText = transcriptionTextEl ? transcriptionTextEl.value.trim() : '';
-        if (transcriptionText) {
-            formData.append('text', transcriptionText);
-            console.log('Transcription text included:', transcriptionText.length, 'characters');
-            console.log('Transcription preview:', transcriptionText.substring(0, 50) + (transcriptionText.length > 50 ? '...' : ''));
-        } else {
-            console.log('No transcription text provided (optional but recommended for better quality)');
-        }
-
-        // Check if transcription is available and if user has provided text
-        const hasUserTranscription = transcriptionText && transcriptionText.length > 0;
-        const willAutoTranscribe = window.serverCapabilities?.transcription?.whisperAvailable && !hasUserTranscription;
-
-        // Simulate progress (since fetch doesn't support progress events for uploads easily)
-        let progress = 0;
-        progressText.textContent = 'Preparing upload...';
-
-        const progressInterval = setInterval(() => {
-            progress += 5;
-            if (progress <= 25) {
-                progressBar.style.width = progress + '%';
-                progressText.textContent = `Uploading audio... ${progress}%`;
-            } else if (progress <= 50) {
-                progressBar.style.width = progress + '%';
-                if (willAutoTranscribe) {
-                    progressText.textContent = `Transcribing audio with AI... ${progress}%`;
-                } else {
-                    progressText.textContent = `Processing audio format... ${progress}%`;
-                }
-            } else if (progress <= 75) {
-                progressBar.style.width = progress + '%';
-                progressText.textContent = `Analyzing voice patterns... ${progress}%`;
-            } else if (progress <= 90) {
-                progressBar.style.width = progress + '%';
-                progressText.textContent = `Creating voice model... ${progress}%`;
-            }
-        }, 300);
-
-        // Upload to backend
-        const response = await fetch(`${API_URL}/voice/upload`, {
-            method: 'POST',
-            body: formData
-        });
-
-        clearInterval(progressInterval);
-
-        // Parse response
-        const data = await response.json();
-
-        if (!response.ok) {
-            // Handle specific error cases
-            console.error('Upload failed:', data);
-
-            let errorMessage = data.error || 'Upload failed';
-
-            // Check for format-specific errors
-            if (data.details && typeof data.details === 'string') {
-                if (data.details.includes('format') || data.details.includes('mime')) {
-                    const browser = detectBrowser();
-                    if (browser === 'safari') {
-                        errorMessage += '\n\nSafari recording format issue detected. Try:\n' +
-                            '1. Recording with Chrome or Firefox instead\n' +
-                            '2. Uploading an MP3 or WAV file directly';
-                    } else if (browser === 'firefox') {
-                        errorMessage += '\n\nFirefox recording format issue detected. Try:\n' +
-                            '1. Recording with Chrome instead\n' +
-                            '2. Uploading an MP3 or WAV file directly';
-                    }
-                }
-            }
-
-            if (data.suggestion) {
-                errorMessage += '\n\nSuggestion: ' + data.suggestion;
-            }
-
-            throw new Error(errorMessage);
-        }
-
-        currentModelId = data.modelId;
-
-        // Log success info
-        console.log('Upload successful!');
-        console.log('Model ID:', currentModelId);
-        if (data.formatInfo) {
-            console.log('Format info:', data.formatInfo);
-        }
-        if (data.transcription) {
-            console.log('Transcription info:', data.transcription);
-        }
-
-        // Complete progress
-        progressBar.style.width = '100%';
-
-        // Show transcription result in progress text
-        if (data.transcription && data.transcription.source === 'auto') {
-            progressText.textContent = `Upload complete! Auto-transcribed ${data.transcription.characterCount} characters.`;
-        } else if (data.transcription && data.transcription.source === 'user') {
-            progressText.textContent = 'Upload complete with your transcription!';
-        } else {
-            progressText.textContent = 'Upload complete!';
-        }
-
-        // Show format conversion info if applicable
-        if (data.formatInfo && data.formatInfo.converted) {
-            console.log(`Audio was converted from ${data.formatInfo.originalFormat} to ${data.formatInfo.uploadedFormat}`);
-        }
-
-        // Store server transcription if available (for reference)
-        if (data.transcription && data.transcription.text) {
-            autoTranscribedText = data.transcription.text;
-        }
-
-        setTimeout(() => {
-            // Move to step 2
-            document.getElementById('clone-step-1').classList.add('hidden');
-            document.getElementById('clone-step-2').classList.remove('hidden');
-            document.getElementById('model-id').value = currentModelId;
-        }, 1000);
-
-    } catch (error) {
-        console.error('Upload error:', error);
-
-        // Reset UI
-        progressBar.style.width = '0%';
-        uploadBtn.disabled = false;
-        progressDiv.classList.add('hidden');
-
-        // Show user-friendly error
-        alert(error.message || 'Failed to upload voice. Please try again.');
-    }
+    // Move to step 2 with the link stored as the reference
+    document.getElementById('clone-step-1').classList.add('hidden');
+    document.getElementById('clone-step-2').classList.remove('hidden');
+    document.getElementById('model-id').value = link;
 }
 
 // Character count for script text
